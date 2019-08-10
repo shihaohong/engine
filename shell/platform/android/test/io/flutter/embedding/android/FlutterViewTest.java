@@ -6,6 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.WindowInsets;
+import android.view.DisplayCutout;
+import android.graphics.Insets;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,6 +39,9 @@ import io.flutter.embedding.engine.systemchannels.SystemChannel;
 import io.flutter.plugin.platform.PlatformPlugin;
 import io.flutter.plugin.platform.PlatformViewsController;
 import io.flutter.view.FlutterMain;
+import sun.rmi.runtime.Log;
+
+import java.lang.reflect.Constructor;
 
 import static android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW;
 import static org.junit.Assert.assertEquals;
@@ -44,6 +53,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 @Config(manifest=Config.NONE)
 @RunWith(RobolectricTestRunner.class)
@@ -54,16 +64,41 @@ public class FlutterViewTest {
     FlutterView flutterView = new FlutterView(RuntimeEnvironment.application);
 
     // Connect the FlutterView to the mock engine
-    flutterView.attachToFlutterEngine(mockFlutterEngine());
+    FlutterEngine mockEngine = mockFlutterEngine();
+    flutterView.attachToFlutterEngine(mockEngine);
 
-    // Call FlutterView.onApplyWindowInsets w/ WindowInsets
+    // try {
+    //   Constructor<Insets> insetsConstructor = Insets.class.getDeclaredConstructor();
+    //   insetsConstructor.setAccessible(true);
+    //   Insets insets = insetsConstructor.newInstance();
 
-    // Check if getRenderer().setViewPortMetrics is
-      // called once
-      // passes the correct object through
+    //   DisplayCutout displayCutout = new DisplayCutout(
+    //     insets,
+    //     new Rect(0, 0, 0, 0),
+    //     new Rect(0, 0, 0, 0),
+    //     new Rect(0, 0, 0, 0),
+    //     new Rect(0, 0, 0, 0)
+    //   );
 
-    assertEquals(true, true);
-    // FlutterView flutterView = new FlutterView(flutterActivity);
+    //  WindowInsets windowInsets = new WindowInsets.Builder()
+    //     .setDisplayCutout(displayCutout)
+    //     .setMandatorySystemGestureInsets(insets)
+    //     .setStableInsets(insets)
+    //     .setSystemGestureInsets(insets)
+    //     .setSystemWindowInsets(insets)
+    //     .setTappableElementInsets(insets)
+    //     .build();
+
+
+
+      // Call FlutterView.onApplyWindowInsets w/ WindowInsets
+      flutterView.onApplyWindowInsets(mock(WindowInsets.class));
+
+      verify(mockEngine.getRenderer(), times(1)).setViewPortMetrics();
+      // Check if getRenderer().setViewPortMetrics is
+        // called once
+        // passes the correct object through
+
   }
 
   // Create a mock WindowInsets class
@@ -89,6 +124,8 @@ public class FlutterViewTest {
     when(fakeMessageBuilder.setUse24HourFormat(any(Boolean.class))).thenReturn(fakeMessageBuilder);
     when(fakeSettingsChannel.startMessage()).thenReturn(fakeMessageBuilder);
 
+    FlutterRenderer fakeFlutterRenderer = mock(FlutterRenderer.class);
+
     // Mock FlutterEngine and all of its required direct calls.
     FlutterEngine engine = mock(FlutterEngine.class);
     when(engine.getRenderer()).thenReturn(mock(FlutterRenderer.class));
@@ -98,19 +135,6 @@ public class FlutterViewTest {
     when(engine.getSettingsChannel()).thenReturn(fakeSettingsChannel);
     when(engine.getLocalizationChannel()).thenReturn(mock(LocalizationChannel.class));
 
-    // when(engine.getKeyEventChannel()).thenReturn(mock(PlatformViewsController.class));
-    // when(engine.getLifecycleChannel()).thenReturn(mock(LifecycleChannel.class));
-    // when(engine.getNavigationChannel()).thenReturn(mock(NavigationChannel.class));
-    // when(engine.getSystemChannel()).thenReturn(mock(SystemChannel.class));
-    // when(engine.getActivityControlSurface()).thenReturn(mock(ActivityControlSurface.class));
-
     return engine;
-  }
-
-  @NonNull
-  private Context mockContext() {
-    Context context = mock(Context.class);
-
-    return context;
   }
 }

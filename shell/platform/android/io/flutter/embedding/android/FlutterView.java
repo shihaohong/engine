@@ -299,7 +299,7 @@ public class FlutterView extends FrameLayout {
   @RequiresApi(20)
   @NonNull
   public final WindowInsets onApplyWindowInsets(@NonNull WindowInsets insets) {
-    WindowInsets newInsets = super.onApplyWindowInsets(insets);
+    // WindowInsets newInsets = super.onApplyWindowInsets(insets);
 
     // Status bar (top) and left/right system insets should partially obscure the content (padding).
     viewportMetrics.paddingTop = insets.getSystemWindowInsetTop();
@@ -330,8 +330,8 @@ public class FlutterView extends FrameLayout {
         + ", Right: " + viewportMetrics.systemGestureInsetRight + ", Bottom: " + viewportMetrics.viewInsetBottom);
 
     sendViewportMetricsToFlutter();
-
-    return newInsets;
+    return insets;
+    // return newInsets;
   }
 
   /**
